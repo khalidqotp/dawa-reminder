@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TextInput, Image, Alert } from 'react-native';
 import { addDays, addMonths, format } from 'date-fns';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { useApp } from '../store/AppContext';
 import { todayISO, WEEKDAYS_AR, MEALS_AR, MEAL_KEYS, RELATIONS_AR, FORMS_AR, DATE_RE } from '../utils/time';
-import { Card, SectionTitle, PrimaryButton, Chip } from '../components/ui';
+import { Card, SectionTitle, PrimaryButton, Chip, TimePickerField } from '../components/ui';
 import { COLORS, FONT } from '../theme';
 
 const SCHEDULE_TYPES = [
@@ -31,25 +31,6 @@ const EMPTY = {
   alwaysOffSunday: true,
   enabled: true,
 };
-
-function TimeInput({ value, onChange }) {
-  const [v, setV] = useState(value || '08:00');
-  useEffect(() => setV(value || '08:00'), [value]);
-  return (
-    <TextInput
-      style={styles.timeInput}
-      value={v}
-      onChangeText={setV}
-      onBlur={() => {
-        const m = v.match(/^(\d{1,2}):(\d{2})$/);
-        if (m && +m[1] < 24 && +m[2] < 60) onChange(`${m[1].padStart(2, '0')}:${m[2]}`);
-        else setV(value || '08:00');
-      }}
-      keyboardType="numbers-and-punctuation"
-      maxLength={5}
-    />
-  );
-}
 
 function DateInput({ value, onChange, placeholder }) {
   return (
@@ -120,7 +101,7 @@ export default function MedFormScreen({ route, navigation }) {
             <Text style={styles.label}>الأوقات</Text>
             {med.times.map((t, i) => (
               <View key={i} style={styles.timeRow}>
-                <TimeInput value={t} onChange={(v) => { const times = [...med.times]; times[i] = v; set({ times }); }} />
+                <TimePickerField value={t} onChange={(v) => { const times = [...med.times]; times[i] = v; set({ times }); }} />
                 <PrimaryButton small outline color={COLORS.danger} title="حذف" onPress={() => set({ times: med.times.filter((_, j) => j !== i) })} />
               </View>
             ))}
@@ -153,7 +134,7 @@ export default function MedFormScreen({ route, navigation }) {
         {st === 'alternate' && (
           <View>
             <Text style={styles.label}>وقت الجرعة في أيام "نعم"</Text>
-            <TimeInput value={(med.times || [])[0] || '00:30'} onChange={(v) => set({ times: [v] })} />
+            <TimePickerField value={(med.times || [])[0] || '00:30'} onChange={(v) => set({ times: [v] })} />
             <Text style={styles.note}>الأحد دائمًا بدون جرعة، ولا يُحتسب من التبديل ولا يزحلق الجدول.</Text>
           </View>
         )}
@@ -167,7 +148,7 @@ export default function MedFormScreen({ route, navigation }) {
               ))}
             </View>
             <Text style={styles.label}>الوقت</Text>
-            <TimeInput value={(med.times || [])[0] || '10:00'} onChange={(v) => set({ times: [v] })} />
+            <TimePickerField value={(med.times || [])[0] || '10:00'} onChange={(v) => set({ times: [v] })} />
             <Text style={styles.note}>يمكن تغيير يوم الحقنة بسهولة في أي وقت من هنا.</Text>
           </View>
         )}
@@ -207,13 +188,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', borderWidth: 1.5, borderColor: COLORS.border, borderRadius: 12,
     paddingHorizontal: 14, paddingVertical: 11, fontFamily: FONT.regular, fontSize: 15, color: COLORS.text,
   },
-  timeInput: {
-    backgroundColor: '#fff', borderWidth: 1.5, borderColor: COLORS.border, borderRadius: 12,
-    paddingHorizontal: 14, paddingVertical: 9, fontFamily: FONT.bold, fontSize: 16, color: COLORS.primary,
-    width: 110, textAlign: 'center',
-  },
   timeRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center' },
+  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
   note: { fontFamily: FONT.regular, fontSize: 12.5, color: COLORS.accent, marginTop: 8 },
   bigPhoto: { width: '100%', height: 180, borderRadius: 12, marginBottom: 10, resizeMode: 'contain', backgroundColor: COLORS.bg },
 });
