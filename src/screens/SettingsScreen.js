@@ -1,29 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TextInput, Switch, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, StyleSheet, Switch, Alert } from 'react-native';
 import { useApp } from '../store/AppContext';
 import { MEALS_AR, MEAL_KEYS } from '../utils/time';
 import { sendTestNotification, rescheduleAll } from '../services/notifications';
-import { Card, SectionTitle, PrimaryButton } from '../components/ui';
+import { Card, SectionTitle, PrimaryButton, TimePickerField } from '../components/ui';
 import { COLORS, FONT } from '../theme';
 
 function MealRow({ label, value, onSave }) {
-  const [v, setV] = useState(value);
-  useEffect(() => setV(value), [value]);
   return (
     <View style={styles.mealRow}>
       <Text style={styles.mealLabel}>{label}</Text>
-      <TextInput
-        style={styles.mealInput}
-        value={v}
-        onChangeText={setV}
-        onBlur={() => {
-          const m = v.match(/^(\d{1,2}):(\d{2})$/);
-          if (m && +m[1] < 24 && +m[2] < 60) onSave(`${m[1].padStart(2, '0')}:${m[2]}`);
-          else setV(value);
-        }}
-        keyboardType="numbers-and-punctuation"
-        maxLength={5}
-      />
+      <TimePickerField value={value} onChange={onSave} />
     </View>
   );
 }
@@ -62,7 +49,7 @@ export default function SettingsScreen({ navigation }) {
         <SectionTitle>التنبيهات</SectionTitle>
         <Text style={styles.note}>حالة الإذن: {permission === 'granted' ? '✅ مسموح' : '⚠️ غير مسموح — اسمح بالإشعارات من إعدادات الجهاز'}</Text>
         <PrimaryButton outline title="🔔 جرّب التنبيه الآن" onPress={sendTestNotification} />
-        <PrimaryButton outline title="🔄 إعادة جدولة كل التنبيهات" onPress={async () => { await rescheduleAll(meds, settings); Alert.alert('تمت إعادة الجدولة ✅'); }} />
+        <PrimaryButton outline title="🔄 إعادة جدولة كل التنبيهات" onPress={async () => { await rescheduleAll(meds, settings, { full: true }); Alert.alert('تمت إعادة الجدولة ✅'); }} />
         <PrimaryButton title="🛠 التنبيهات والتذكيرات الدقيقة" onPress={() => navigation.navigate('Troubleshoot')} />
       </Card>
     </ScrollView>
@@ -74,9 +61,4 @@ const styles = StyleSheet.create({
   note: { fontFamily: FONT.regular, fontSize: 13, color: COLORS.sub, marginBottom: 8 },
   mealRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   mealLabel: { flex: 1, fontFamily: FONT.semi, fontSize: 15, color: COLORS.text },
-  mealInput: {
-    backgroundColor: '#fff', borderWidth: 1.5, borderColor: COLORS.border, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 7, fontFamily: FONT.bold, fontSize: 15, color: COLORS.primary,
-    width: 96, textAlign: 'center',
-  },
 });
