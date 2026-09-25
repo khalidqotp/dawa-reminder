@@ -20,6 +20,28 @@ export function minutesToHHMM(total) {
   return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
 }
 
+// تحويل "HH:mm" (24 ساعة) إلى {hour12, minute, period} لعرضها بصيغة 12 ساعة بالعربي
+export function to12Hour(hhmm) {
+  const [h, m] = String(hhmm || '08:00').split(':').map(Number);
+  const period = h < 12 ? 'ص' : 'م';
+  let hour12 = h % 12;
+  if (hour12 === 0) hour12 = 12;
+  return { hour12, minute: m, period };
+}
+
+// تحويل {hour12, minute, period} إلى "HH:mm" (24 ساعة)
+export function from12Hour(hour12, minute, period) {
+  let h = hour12 % 12;
+  if (period === 'م') h += 12;
+  return `${String(h).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+}
+
+// عرض نصي "10:05 ص" لوقت بصيغة "HH:mm"
+export function formatTimeAr12(hhmm) {
+  const { hour12, minute, period } = to12Hour(hhmm);
+  return `${hour12}:${String(minute).padStart(2, '0')} ${period}`;
+}
+
 // موعد الجرعة المرتبطة بوجبة = موعد الوجبة ± 30 دقيقة
 export function mealOffsetTime(meals, mealKey, relation, offsetMin = 30) {
   const base = timeToMinutes((meals && meals[mealKey]) || '08:00');
@@ -100,10 +122,10 @@ export function buildDosesForDate(meds, settings, dateISO) {
 }
 
 export function describeSchedule(med, settings) {
-  if (med.scheduleType === 'daily') return `يوميًا — ${(med.times || []).join('، ')}`;
+  if (med.scheduleType === 'daily') return `يوميًا — ${(med.times || []).map(formatTimeAr12).join('، ')}`;
   if (med.scheduleType === 'mealLinked') return (med.mealLinks || []).map((l) => `${RELATIONS_AR[l.relation]} ${MEALS_AR[l.meal]}`).join('، ');
-  if (med.scheduleType === 'alternate') return `يوم نعم / يوم لا — ${(med.times || [])[0] || ''} (الأحد دائمًا بدون)`;
-  if (med.scheduleType === 'weekly') return `كل ${WEEKDAYS_AR[med.weekday]} — ${(med.times || [])[0] || ''}`;
+  if (med.scheduleType === 'alternate') return `يوم نعم / يوم لا — ${formatTimeAr12((med.times || [])[0] || '00:30')} (الأحد دائمًا بدون)`;
+  if (med.scheduleType === 'weekly') return `كل ${WEEKDAYS_AR[med.weekday]} — ${formatTimeAr12((med.times || [])[0] || '10:00')}`;
   return '';
 }
 
