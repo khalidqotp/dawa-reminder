@@ -50,10 +50,10 @@ export default function MedsScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
-  row: { flexDirection: 'row', alignItems: 'flex-start' },
+  row: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   iconBox: {
     width: 52, height: 52, borderRadius: 12, backgroundColor: COLORS.primarySoft,
-    alignItems: 'center', justifyContent: 'center', marginRight: 12,
+    alignItems: 'center', justifyContent: 'center',
   },
   photo: { width: 52, height: 52, borderRadius: 12 },
   name: { fontFamily: FONT.bold, fontSize: 16, color: COLORS.text },
