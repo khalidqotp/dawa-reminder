@@ -1,7 +1,7 @@
 name: Build Android APK
 
 on:
-  workflow_dispatch: # يسمح بتشغيل البناء يدوياً بنقرة زر
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,7 +14,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: 🏗 Setup EAS CLI
         uses: expo/expo-github-action@v8
@@ -23,7 +22,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: 🚀 Build APK with EAS
         run: eas build --platform android --profile apk --non-interactive
