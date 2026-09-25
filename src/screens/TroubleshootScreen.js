@@ -42,10 +42,10 @@ export default function TroubleshootScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   intro: { fontFamily: FONT.semi, fontSize: 14.5, color: COLORS.primary },
-  stepRow: { flexDirection: 'row', marginBottom: 12, alignItems: 'flex-start' },
+  stepRow: { flexDirection: 'row', marginBottom: 12, alignItems: 'flex-start', gap: 10 },
   stepNum: {
     width: 26, height: 26, borderRadius: 13, backgroundColor: COLORS.primary,
-    alignItems: 'center', justifyContent: 'center', marginRight: 10,
+    alignItems: 'center', justifyContent: 'center',
   },
   stepNumText: { color: '#fff', fontFamily: FONT.bold, fontSize: 14 },
   stepText: { flex: 1, fontFamily: FONT.regular, fontSize: 14, color: COLORS.text, lineHeight: 22 },
