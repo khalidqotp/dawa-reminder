@@ -10,19 +10,28 @@ jobs:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v4
 
+      - name: ⚙️ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: 🏗 Setup EAS CLI
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+      - name: 📦 Install EAS CLI
+        run: npm install -g eas-cli
 
       - name: 📦 Install dependencies
         run: npm install
 
-      - name: 🚀 Build APK with EAS
-        run: eas build --platform android --profile apk --non-interactive
+      - name: 🚀 Build APK locally on GitHub
+        run: eas build --platform android --profile apk --local --non-interactive
+
+      - name: 📤 Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dawa-reminder-apk
+          path: "*.apk"
